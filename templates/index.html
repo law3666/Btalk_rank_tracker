@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bitcointalk Progress Tracker</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    #progressBar {
+      display: none;
+      margin-top: 15px;
+    }
+    #resultBox {
+      margin-top: 15px;
+      display: none;
+    }
+  </style>
+</head>
+<body class="bg-light">
+  <div class="container mt-5">
+    <h2 class="mb-4 text-center">🔍 Bitcointalk Rank Progress Tracker 🎖</h2>
+	<p class="text-center mt-3">Bitcointalk Rank Progress Tracker is a lightweight yet powerful tool designed to help forum users! especially Newbies and Jr. Members monitor their profile growth and rank advancement within the Bitcointalk community.
+		By simply entering their unique profile URL, the system will scrape real time data such as posts, activity, and merit, then calculates the user's current rank, next rank target, and overall progress. 
+		This tracker provides fast, accurate insights to support consistent account growth and goal tracking.</p>
+ <div class="card shadow p-4">
+    <form id="scrapeForm">
+      <div class="mb-3">
+        <label for="profileUrl" class="form-label">Enter Bitcointalk Profile URL</label>
+        <input
+          type="url"
+          id="profileUrl"
+          class="form-control"
+          placeholder="https://bitcointalk.org/index.php?action=profile;u=123456"
+          required
+        />
+      </div>
+      <button type="submit" class="btn btn-success w-100">Check Progress</button>
+    </form>
+
+    <div id="progressBar" class="progress mt-3">
+      <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+           style="width: 100%">Loading...
+      </div>
+    </div>
+
+    <div id="resultBox" class="alert mt-3"></div>
+	 </div>
+        <p class="text-center mt-3 text-muted">Keep posting to climb the ranks! 🚀</p>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

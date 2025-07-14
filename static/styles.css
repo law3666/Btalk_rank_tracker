@@ -1,0 +1,30 @@
+
+body {
+    background-color: #f8f9fa;
+    font-family: 'Arial', sans-serif;
+}
+.card {
+    border-radius: 15px;
+    background-color: #ffffff;
+}
+h1 {
+    color: #343a40;
+    font-weight: bold;
+}
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    font-weight: bold;
+    border-radius: 8px;
+}
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+#result {
+    background-color: #e9ecef;
+    padding: 15px;
+    border-radius: 8px;
+}
+.progress {
+    height: 20px;
+}
