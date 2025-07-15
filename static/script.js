@@ -86,7 +86,7 @@ function getRankProgress(activity, merit) {
 
       const data = await response.json();
       console.log('✅ Response from Flask:', data);
-	  const rankInfo = getRankProgress(data.activity, data.merit);
+	  //const rankInfo = getRankProgress(data.activity, data.merit);
 
       if (response.ok) {
 		  document.getElementById('progressDetails').style.display = 'block';
