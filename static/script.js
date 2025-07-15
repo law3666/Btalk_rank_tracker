@@ -76,7 +76,7 @@ function getRankProgress(activity, merit) {
     showResult('Scraping in progress...', false);
 
     try {
-      const response = await fetch('http://localhost:5000/scrape', {
+      const response = await fetch('/scrape', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
