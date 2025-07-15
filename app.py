@@ -27,14 +27,20 @@ def calculate_rank(activity, merit):
         rank = RANKS[i]
         if activity < rank["activity"] or merit < rank["merit"]:
             if i == 0:
-                return "Brand New", RANKS[i + 1]["name"], 0
+                return "Brand New", RANKS[i + 1]["name"], 0, 0, 0, RANKS[i + 1]["activity"], RANKS[i + 1]["merit"]
             current = RANKS[i - 1]
             next_rank = RANKS[i]
-            activity_progress = min(100, round((activity / next_rank["activity"]) * 100)) if next_rank["activity"] else 0
-            merit_progress = min(100, round((merit / next_rank["merit"]) * 100)) if next_rank["merit"] else 0
-            progress = min(activity_progress, merit_progress)
-            return current["name"], next_rank["name"], progress
-    return "Legendary", "Max Rank", 100
+            
+            activity_progress = min(100, round((activity / next_rank["activity"]) * 100))
+            merit_progress = min(100, round((merit / next_rank["merit"]) * 100))
+            progress = round((activity_progress + merit_progress) / 2)
+
+            needed_activity = max(0, next_rank["activity"] - activity)
+            needed_merit = max(0, next_rank["merit"] - merit)
+
+            return current["name"], next_rank["name"], progress, activity_progress, merit_progress, needed_activity, needed_merit
+
+    return "Legendary", "Max Rank", 100, 100, 100, 0, 0
 
 @app.route('/scrape', methods=['POST'])
 def scrape():
@@ -84,7 +90,7 @@ def scrape():
         except:
             merit_int = 0
 
-        current_rank, next_rank, progress = calculate_rank(activity_int, merit_int)
+        current_rank, next_rank, progress, act_prog, merit_prog, needed_activity, needed_merit = calculate_rank(activity_int, merit_int)
 
         print(f"✅ Scrape successful for {username}")
         return jsonify({
@@ -95,8 +101,12 @@ def scrape():
             "merit": merit,
             "current_rank": current_rank,
             "next_rank": next_rank,
-            "progress": progress
-        })
+            "progress": progress,
+            "activity_progress": act_prog,
+            "merit_progress": merit_prog,
+            "needed_activity": needed_activity,
+            "needed_merit": needed_merit
+})
 
     except Exception as e:
         print(f"❌ Error: {e}")

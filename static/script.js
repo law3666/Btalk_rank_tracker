@@ -89,6 +89,20 @@ function getRankProgress(activity, merit) {
 	  const rankInfo = getRankProgress(data.activity, data.merit);
 
       if (response.ok) {
+		  document.getElementById('progressDetails').style.display = 'block';
+
+			const act = data.activity_progress || 0;
+			const merit = data.merit_progress || 0;
+			const overall = data.progress || 0;
+
+			document.getElementById('activityProgressBar').style.width = `${act}%`;
+			document.getElementById('activityProgressBar').textContent = `${act}%`;
+
+			document.getElementById('meritProgressBar').style.width = `${merit}%`;
+			document.getElementById('meritProgressBar').textContent = `${merit}%`;
+
+			document.getElementById('overallProgressBar').style.width = `${overall}%`;
+			document.getElementById('overallProgressBar').textContent = `${overall}%`;
         showResult(`
   ✅ Scrape successful<br>
   👤 <strong>Username:</strong> ${data.username || 'N/A'}<br>
@@ -97,6 +111,7 @@ function getRankProgress(activity, merit) {
   ⭐️ <strong>Merit:</strong> ${data.merit || 'N/A'}<br>
   🏅 <strong>Current Rank:</strong> ${data.current_rank || 'N/A'}<br>
   ⏭️ <strong>Next Rank:</strong> ${data.next_rank || 'N/A'}<br>
+  💡 <strong>To Rank Up:</strong> <strong>Activity needed:</strong> ${data.needed_activity} <strong>||</strong> <strong>Merit needed:</strong>  ${data.needed_merit}<br>
   📊 <strong>Progress:</strong> ${data.progress}%<br>
 `, false);
       } else {
@@ -109,7 +124,7 @@ function getRankProgress(activity, merit) {
 
     showProgress(false);
   });
-
+document.getElementById('progressDetails').style.display = 'block';
   function showProgress(show) {
     progressBar.style.display = show ? 'block' : 'none';
   }
