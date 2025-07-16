@@ -56,7 +56,43 @@ function getRankProgress(activity, merit) {
     next: nextRank.name,
   };
 }
+	function buildFullRankBreakdown(activity, merit) {
+	  const ranks = [
+		{ name: "Newbie", activity: 0, merit: 0 },
+		{ name: "Jr. Member", activity: 30, merit: 1 },
+		{ name: "Member", activity: 60, merit: 10 },
+		{ name: "Full Member", activity: 120, merit: 100 },
+		{ name: "Sr. Member", activity: 240, merit: 250 },
+		{ name: "Hero Member", activity: 480, merit: 500 },
+		{ name: "Legendary", activity: 775, merit: 1000 }
+  ];
 
+  const list = document.getElementById('rankProgressList');
+  list.innerHTML = ''; // Clear previous
+
+  ranks.forEach(rank => {
+    const activityPercent = Math.min(100, Math.round((activity / rank.activity) * 100));
+    const meritPercent = Math.min(100, Math.round((merit / rank.merit) * 100));
+    const overall = isNaN(activityPercent) || isNaN(meritPercent) ? 0 : Math.round((activityPercent + meritPercent) / 2);
+
+    const li = document.createElement('li');
+    li.className = 'list-group-item';
+
+    li.innerHTML = `
+      <strong>${rank.name}</strong>
+      <div class="mt-1">
+        <div class="progress mb-1">
+          <div class="progress-bar bg-success" role="progressbar" style="width: ${overall}%;">
+            ${overall}%
+          </div>
+        </div>
+        <small>Activity: ${activity}/${rank.activity}, Merit: ${merit}/${rank.merit}</small>
+      </div>
+    `;
+
+    list.appendChild(li);
+  });
+}
 
   if (!scrapeForm || !profileUrlInput || !progressBar || !resultBox) {
     console.error("❌ Missing DOM elements. Check your HTML IDs.");
@@ -114,6 +150,17 @@ function getRankProgress(activity, merit) {
   💡 <strong>To Rank Up:</strong> <strong>Activity needed:</strong> ${data.needed_activity} <strong>||</strong> <strong>Merit needed:</strong>  ${data.needed_merit}<br>
   📊 <strong>Progress:</strong> ${data.progress}%<br>
 `, false);
+			buildFullRankBreakdown(data.activity, data.merit);
+			document.getElementById('showAllRanksToggle').addEventListener('change', function () {
+				  const isChecked = this.checked;
+				  const fullProgressBox = document.getElementById('fullProgressBox');
+
+		  if (isChecked) {
+			fullProgressBox.style.display = 'block';
+		  } else {
+			fullProgressBox.style.display = 'none';
+		  }
+		});
       } else {
         showResult(`❌ ${data.error || 'Unknown error occurred.'}`, true);
       }
