@@ -13,6 +13,12 @@
       margin-top: 15px;
       display: none;
     }
+	#showAllRanksBtn.active {
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  border-color: #0056b3;
+}
   </style>
 </head>
 <body class="bg-light">
@@ -41,9 +47,11 @@
            style="width: 100%">Loading...
       </div>
     </div>
-<div class="form-check form-switch mt-3 text-center">
-  <input class="form-check-input" type="checkbox" id="showAllRanksToggle">
-  <label class="form-check-label" for="showAllRanksToggle">Show progress across all ranks</label>
+	
+<div class="text-center mt-3">
+  <button id="showAllRanksBtn" class="btn btn-outline-primary">
+    Show progress across all ranks
+  </button>
 </div>
 
     <div id="resultBox" class="alert mt-3"></div>
