@@ -31,8 +31,16 @@ def calculate_rank(activity, merit):
             current = RANKS[i - 1]
             next_rank = RANKS[i]
             
-            activity_progress = min(100, round((activity / next_rank["activity"]) * 100))
-            merit_progress = min(100, round((merit / next_rank["merit"]) * 100))
+            activity_progress = (
+                min(100, round((activity / next_rank["activity"]) * 100))
+                if next_rank["activity"] > 0 else 0
+            )
+            
+            merit_progress = (
+                min(100, round((merit / next_rank["merit"]) * 100))
+                if next_rank["merit"] > 0 else 0
+            )
+            
             progress = round((activity_progress + merit_progress) / 2)
 
             needed_activity = max(0, next_rank["activity"] - activity)

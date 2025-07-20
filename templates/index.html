@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <title>Bitcointalk Progress Tracker</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='card-style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
     #progressBar {
       display: none;
@@ -26,7 +28,7 @@
     <h2 class="mb-4 text-center">🔍 Bitcointalk Rank Progress Tracker 🎖</h2>
 	<p class="text-center mt-3">Bitcointalk Rank Progress Tracker is a lightweight yet powerful tool designed to help forum users! especially Newbies and Jr. Members monitor their profile growth and rank advancement within the Bitcointalk community.
 		By simply entering their unique profile URL, the system will scrape real time data such as posts, activity, and merit, then calculates the user's current rank, next rank target, and overall progress. 
-		This tracker provides fast, accurate insights to support consistent account growth and goal tracking.</p>
+		This tracker provides fast, accurate insights to support consistent account growth and goal tracking. <b style="color:red;">You can also generate a Bitcointalk Beautiful FiFA-Like Rank Card for fun after a successful profile scrape result</b> </p>
  <div class="card shadow p-4">
     <form id="scrapeForm">
       <div class="mb-3">
@@ -53,9 +55,22 @@
     Show progress across all ranks
   </button>
 </div>
+<div class="text-center mt-2">
+  <button id="generateCardBtn" class="btn btn-primary">
+    🎴 Generate Rank Card
+  </button>
+</div>
 
     <div id="resultBox" class="alert mt-3"></div>
 	<div id="progressDetails" class="mt-3" style="display: none;">
+	<!-- Card Preview Box -->
+<div id="cardPreviewBox" class="mt-4" style="display: none;">
+  <h5 class="text-center">🎴 Your Rank Card</h5>
+
+  <div class="text-center mt-3">
+    <button id="downloadCardBtn" class="btn btn-primary">Download Rank Card</button>
+  </div>
+</div>
   <label><strong>Activity Progress</strong></label>
   <div class="progress mb-2">
     <div id="activityProgressBar" class="progress-bar bg-info" role="progressbar" style="width: 0%">0%</div>
@@ -80,5 +95,61 @@
   </div>
 
   <script src="{{ url_for('static', filename='script.js') }}"></script>
+  
+  <!-- Modal for Rank Card Preview -->
+<div class="modal fade" id="cardPreviewModal" tabindex="-1" aria-labelledby="cardPreviewLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cardPreviewLabel">🎴 Rank Card Preview</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div id="cardPreviewContainer">
+          <!-- Card will be dynamically injected here -->
+	<div id="cardPreview" class="card-bg-overlay p-4 text-white text-center rounded-4 rank-card" style="background: linear-gradient(135deg, #2b2b2b, #444); box-shadow: 0 8px 20px rgba(0,0,0,0.5); max-width: 350px; margin: auto;">
+       <div class="card-overlay"></div> <!-- Add overlay layer -->
+	 <!-- Slanted Rank -->
+  <div class="rank-badge-slant" id="cardRankSlant">Member</div>
+    <img id="cardAvatar" class="rounded-circle border border-3 border-light mb-3" src="" alt="Avatar" style="width: 100px; height: 100px;">
+	
+    <h3 id="cardUsername" class="mb-1" style="font-family: 'Arial Black', sans-serif; font-size: 1.5rem;">Username</h3>
+	
+	<div class="stats">
+  <p>🕒 Activity: <span id="cardActivityValue">0</span></p>
+  <p>⭐️ Merit: <span id="cardMeritValue">0</span></p>
+  <p>⏭️ Next Rank: <span id="cardNextRankValue" class="badge bg-warning text-dark mb-3" style="font-size: 1rem;">N/A</span></p>
+</div>
+
+    <!--<div id="cardRank" class="badge bg-warning text-dark mb-3" style="font-size: 1rem;"></div>-->
+
+    <div class="mb-3">
+      <p class="mb-1 fw-bold">Activity Progress</p>
+      <div class="progress" style="height: 20px;">
+        <div id="cardActivityBar" class="progress-bar bg-warning" role="progressbar" style="width: 0%;">
+          <span id="cardActivityPercent" class="ms-2" style="width: 0%;">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-2">
+      <p class="mb-1 fw-bold">Merit Progress</p>
+      <div class="progress" style="height: 20px;">
+        <div id="cardMeritBar" class="progress-bar bg-warning" role="progressbar" style="width: 0%;">
+          <span id="cardMeritPercent" class="ms-2">0%</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+		  
+        </div>
+         <!--<button class="btn btn-success mt-3" id="downloadCardBtnModal">⬇️ Download This Card</button>-->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

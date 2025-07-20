@@ -1,0 +1,317 @@
+/* Base card style */
+.card-preview {
+  width: 300px;
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: transform 0.3s ease;
+}
+
+.card-preview:hover {
+  transform: scale(1.03);
+}
+
+.card-preview img.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+  border: 3px solid #fff;
+}
+
+/* Rank-specific themes */
+.card-preview.brand_new { background: linear-gradient(135deg, #4e4e4e, #2a2a2a); }
+.card-preview.newbie { background: linear-gradient(135deg, #606c88, #3f4c6b); }
+.card-preview.jr_member { background: linear-gradient(135deg, #00c6ff, #0072ff); }
+.card-preview.member { background: linear-gradient(135deg, #43cea2, #185a9d); }
+.card-preview.full_member { background: linear-gradient(135deg, #f7971e, #ffd200); }
+.card-preview.sr_member { background: linear-gradient(135deg, #e53935, #e35d5b); }
+.card-preview.hero_member { background: linear-gradient(135deg, #8e2de2, #4a00e0); }
+.card-preview.legendary { background: linear-gradient(135deg, #000000, #434343); border: 2px solid gold; }
+
+/* Optional tweaks */
+.card-preview h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.card-preview p {
+  margin: 5px 0;
+  font-size: 0.95rem;
+}
+.card-base {
+  padding: 20px;
+  border-radius: 12px;
+  color: white;
+  text-align: center;
+  transition: 0.3s ease;
+}
+
+.card-newbie { background: #9ca3af; }         /* gray */
+.card-jr-member { background: #60a5fa; }     /* blue */
+.card-member { background: #34d399; }        /* green */
+.card-full-member { background: #fbbf24; }   /* yellow */
+.card-sr-member { background: #f97316; }     /* orange */
+.card-hero-member { background: #ef4444; }   /* red */
+.card-legendary { background: #8b5cf6; }     /* violet */
+#cardPopup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+#cardPopupContent {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  width: 350px;
+  text-align: center;
+  position: relative;
+}
+
+.close-card-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+#cardPreview .avatar-img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+  object-fit: cover;
+}
+
+/* Themed Backgrounds per Rank */
+#cardPopupContent.brand_new   { background: #f5f5f5; }
+#cardPopupContent.newbie      { background: #e0f7fa; }
+#cardPopupContent.jr_member   { background: #f1f8e9; }
+#cardPopupContent.member      { background: #fff8e1; }
+#cardPopupContent.full_member { background: #ede7f6; }
+#cardPopupContent.sr_member   { background: #ffe0b2; }
+#cardPopupContent.hero_member { background: #ffcdd2; }
+#cardPopupContent.legendary   { background: #c8e6c9; }
+
+.progress {
+  height: 15px;
+  border-radius: 8px;
+ 
+}
+.rank-badge-slant {
+  position: absolute;
+  top: 10px;
+  right: -40px;
+  background: gold;
+  color: black;
+  font-weight: bold;
+  padding: 8px 50px;
+  transform: rotate(45deg);
+  font-size: 0.9rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  z-index: 10;
+}
+#cardPreview {
+  position: relative;
+}
+
+#cardActivityPercent{
+	
+color:#000;
+ font-size: 0.9rem;
+}
+#cardMeritPercent{
+	
+color:#000;
+ font-size: 0.9rem;
+}
+/* Base slanted badge */
+.rank-badge-slant {
+  position: absolute;
+  top: 10px;
+  right: -40px;
+  transform: rotate(45deg);
+  background-color: #444; /* fallback */
+  color: white;
+  padding: 5px 40px;
+  font-weight: bold;
+  font-size: 14px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+/* Color themes for each rank */
+.rank-Legendary    { background-color: #FFD700; color: #000; } /* Gold */
+.rank-Hero         { background-color: #C0C0C0; color: #000; } /* Silver */
+.rank-SrMember     { background-color: #6495ED; }
+.rank-FullMember   { background-color: #40E0D0; }
+.rank-Member       { background-color: #4CAF50; }
+.rank-JrMember     { background-color: #FF9800; }
+.rank-Newbie       { background-color: #9E9E9E; }
+.rank-Legendary {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  box-shadow: 0 0 15px gold;
+}
+
+.rank-Hero {
+  background: linear-gradient(135deg, #C0C0C0, #A9A9A9);
+  box-shadow: 0 0 10px silver;
+}
+
+/* Base card styling 
+.rank-card {
+  position: relative;
+  width: 320px;
+  padding: 20px;
+  border-radius: 16px;
+  color: white;
+  text-align: center;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  margin: auto;
+  overflow: hidden;
+}*/
+
+/* Rank-specific backgrounds 
+.card-Legendary {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  box-shadow: 0 0 15px gold;
+}
+.card-Hero {
+  background: linear-gradient(135deg, #C0C0C0, #808080);
+  box-shadow: 0 0 12px silver;
+}
+.card-SrMember {
+  background: linear-gradient(135deg, #4682B4, #6CA0DC);
+}
+.card-FullMember {
+  background: linear-gradient(135deg, #40E0D0, #20B2AA);
+}
+.card-Member {
+  background: linear-gradient(135deg, #4CAF50, #2E8B57);
+}
+.card-JrMember {
+  background: linear-gradient(135deg, #FF9800, #FF5722);
+}
+.card-Newbie {
+  background: linear-gradient(135deg, #9E9E9E, #607D8B);
+}*/
+
+.rank-card {
+  position: relative;
+  width: 320px;
+  padding: 20px;
+  border-radius: 20px;
+  text-align: center;
+  color: #fff;
+  margin: auto;
+  overflow: hidden;
+  transition: all 0.5s ease;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Fancy Rank-Specific Backgrounds */
+.card-Legendary {
+  background: linear-gradient(135deg, #ffde59, #ff914d);
+  box-shadow: 0 0 25px gold;
+  border: 3px solid gold;
+}
+
+.card-Hero {
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+  box-shadow: 0 0 20px silver;
+  border: 3px solid silver;
+}
+
+.card-SrMember {
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  border: 2px solid #d0e0ff;
+}
+
+.card-FullMember {
+  background: linear-gradient(135deg, #38ef7d, #11998e);
+  border: 2px solid #a8f9d0;
+}
+
+.card-Member {
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  border: 2px solid #bbdcff;
+}
+
+.card-JrMember {
+  background: linear-gradient(135deg, #f7971e, #ffd200);
+  border: 2px solid #ffeb9e;
+}
+
+.card-Newbie {
+  background: linear-gradient(135deg, #9e9e9e, #607d8b);
+  border: 2px solid #cfd8dc;
+}
+
+/* Optional: add glow effect */
+.rank-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 80%);
+  animation: rotateGlow 6s linear infinite;
+  z-index: 0;
+}
+@keyframes rotateGlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Inner card content stays above the glow */
+.rank-card * {
+  position: relative;
+  z-index: 1;
+}
+.stats p {
+  margin: 0.25rem 0;
+  font-size: 1.1rem;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.card-bg-overlay {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 10, 0.6); /* Dark overlay */
+  z-index: 1;
+}
+
+.card-content {
+  position: relative;
+  z-index: 2;
+}
