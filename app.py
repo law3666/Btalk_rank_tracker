@@ -48,7 +48,7 @@ def calculate_rank(activity, merit):
 
             return current["name"], next_rank["name"], progress, activity_progress, merit_progress, needed_activity, needed_merit
 
-    return "Legendary", "Max Rank", 100, 100, 100, 0, 0
+    return "Legendary", "Final Rank", 100, 100, 100, 0, 0
 
 @app.route('/scrape', methods=['POST'])
 def scrape():

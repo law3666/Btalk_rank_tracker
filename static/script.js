@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return {
         rank: currentRank.name,
         progress: 100,
-        next: "Max rank (Legendary)",
+        next: "Final rank (Legendary)",
       };
     }
 
