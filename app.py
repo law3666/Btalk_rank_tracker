@@ -60,13 +60,30 @@ def scrape():
         search_url = f"https://bitcointalk.org/index.php?action=mlist;sa=search;search={user_input}"
         search_resp = requests.get(search_url, headers=headers, timeout=10)
 
-        if search_resp.status_code == 200:
-            search_soup = BeautifulSoup(search_resp.text, "html.parser")
-            profile_link = search_soup.find("a", href=re.compile(r"action=profile;u=\d+"))
-            if profile_link:
-                profile_url = "https://bitcointalk.org/" + profile_link["href"].lstrip("/")
-                return scrape_profile(profile_url)
+        if search_resp.status_code != 200:
+            return jsonify({"error": "Failed to fetch member search results"}), 500
 
+        search_soup = BeautifulSoup(search_resp.text, "html.parser")
+
+        # Find all profile links and their usernames from the search results
+        possible_profiles = []
+        for link in search_soup.find_all("a", href=re.compile(r"action=profile;u=\d+")):
+            # The username text is usually inside the <a> tag
+            found_username = link.text.strip()
+            profile_href = link['href']
+            profile_url = "https://bitcointalk.org/" + profile_href.lstrip("/")
+            possible_profiles.append((found_username, profile_url))
+
+        # Try exact match (case insensitive)
+        for uname, url in possible_profiles:
+            if uname.lower() == user_input.lower():
+                return scrape_profile(url)
+
+        # If no exact match, fallback: return first profile if exists
+        if possible_profiles:
+            return scrape_profile(possible_profiles[0][1])
+
+        # No profiles found at all
         return jsonify({"error": f"No profile found for username '{user_input}'"}), 404
 
     except Exception as e:
