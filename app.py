@@ -152,7 +152,7 @@ def scrape_profile(profile_url):
         "merit_progress": merit_prog,
         "needed_activity": needed_activity,
         "needed_merit": needed_merit
-    })
+})
 
     except Exception as e:
         print(f"❌ Error: {e}")
