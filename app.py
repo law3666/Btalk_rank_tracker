@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import requests
 from bs4 import BeautifulSoup
+from urllib.parse import quote
 import re
 
 app = Flask(__name__)
@@ -44,7 +45,10 @@ def scrape():
     try:
         data = request.get_json()
         user_input = (data.get("url") or "").strip()
-        headers = {'User-Agent': 'Mozilla/5.0'}
+        headers = {
+            'User-Agent': 'Mozilla/5.0',
+            'Accept': 'application/json'
+        }
 
         if not user_input:
             return jsonify({"error": "No URL or username provided"}), 400
@@ -56,15 +60,18 @@ def scrape():
                 profile_url = "https://" + profile_url
             return scrape_profile(profile_url)
 
-        # CASE 2 — Assume it's a username, try BPIP JSON API
-        bpip_api_url = f"https://bpip.org/json.ashx?u={user_input}"
+        # CASE 2 — BPIP API lookup
+        encoded_name = quote(user_input)
+        bpip_api_url = f"https://bpip.org/json.ashx?u={encoded_name}"
         bpip_resp = requests.get(bpip_api_url, headers=headers, timeout=10)
 
         if bpip_resp.status_code == 200:
             try:
                 bpip_data = bpip_resp.json()
             except ValueError:
-                return jsonify({"error": "BPIP returned invalid JSON"}), 500
+                print("⚠ BPIP returned non-JSON. First 200 chars:")
+                print(bpip_resp.text[:200])
+                return jsonify({"error": f"BPIP returned non-JSON response for '{user_input}'"}), 500
 
             if isinstance(bpip_data, list) and bpip_data:
                 user_id = bpip_data[0].get("UserID")
@@ -72,7 +79,6 @@ def scrape():
                     profile_url = f"https://bitcointalk.org/index.php?action=profile;u={user_id}"
                     return scrape_profile(profile_url)
 
-        # No match found
         return jsonify({"error": f"No profile found for username '{user_input}'"}), 404
 
     except Exception as e:
