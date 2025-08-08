@@ -58,16 +58,17 @@ def scrape():
                 profile_url = "https://" + profile_url
             return scrape_profile(profile_url)
 
-        # CASE 2 — Try BPIP API fallback only, since memberlist needs login
+        # CASE 2 — Attempt BPIP API fallback
         from urllib.parse import quote
         encoded_name = quote(user_input)
         bpip_api_url = f"https://bpip.org/json.ashx?u={encoded_name}"
         bpip_resp = requests.get(bpip_api_url, headers=headers, timeout=10)
 
         print("DEBUG: BPIP API status:", bpip_resp.status_code)
-        print("DEBUG: BPIP API response:", bpip_resp.text[:300])
+        print("DEBUG: BPIP API response snippet:", bpip_resp.text[:300])
 
-        if bpip_resp.status_code == 200:
+        # Try parsing JSON only if response looks like JSON (starts with '[' or '{')
+        if bpip_resp.status_code == 200 and bpip_resp.text.strip().startswith('['):
             try:
                 bpip_data = bpip_resp.json()
                 if isinstance(bpip_data, list) and bpip_data:
@@ -77,6 +78,8 @@ def scrape():
                         return scrape_profile(profile_url)
             except Exception as e:
                 print("⚠ BPIP JSON parse error:", e)
+        else:
+            print("⚠ BPIP API response is not JSON; skipping BPIP fallback")
 
         return jsonify({"error": f"No profile found for username '{user_input}'"}), 404
 
