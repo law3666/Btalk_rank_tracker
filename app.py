@@ -49,53 +49,35 @@ def scrape():
         if not user_input:
             return jsonify({"error": "No URL or username provided"}), 400
 
-        # Debug: Print user input
         print("DEBUG: Searching for username:", user_input)
 
-        # CASE 1 — Already a profile link with u=ID
+        # CASE 1 — If already a profile link with u=ID
         if re.search(r"u=\d+", user_input):
             profile_url = user_input
             if not profile_url.startswith("http"):
                 profile_url = "https://" + profile_url
             return scrape_profile(profile_url)
 
-        # CASE 2 — Search Bitcointalk memberlist for username
-        search_url = f"https://bitcointalk.org/index.php?action=mlist;sa=search;search={user_input}"
-        search_resp = requests.get(search_url, headers=headers, timeout=10)
+        # CASE 2 — Try BPIP API fallback only, since memberlist needs login
+        from urllib.parse import quote
+        encoded_name = quote(user_input)
+        bpip_api_url = f"https://bpip.org/json.ashx?u={encoded_name}"
+        bpip_resp = requests.get(bpip_api_url, headers=headers, timeout=10)
 
-        # Debug: print search response status and snippet
-        print("DEBUG: Search page status:", search_resp.status_code)
-        print("DEBUG: Search page content snippet:", search_resp.text[:500])
+        print("DEBUG: BPIP API status:", bpip_resp.status_code)
+        print("DEBUG: BPIP API response:", bpip_resp.text[:300])
 
-        if search_resp.status_code != 200:
-            return jsonify({"error": "Failed to fetch member search results"}), 500
+        if bpip_resp.status_code == 200:
+            try:
+                bpip_data = bpip_resp.json()
+                if isinstance(bpip_data, list) and bpip_data:
+                    user_id = bpip_data[0].get("UserID")
+                    if user_id:
+                        profile_url = f"https://bitcointalk.org/index.php?action=profile;u={user_id}"
+                        return scrape_profile(profile_url)
+            except Exception as e:
+                print("⚠ BPIP JSON parse error:", e)
 
-        search_soup = BeautifulSoup(search_resp.text, "html.parser")
-
-        profile_links = search_soup.find_all("a", href=re.compile(r"action=profile;u=\d+"))
-
-        # Debug: print number of profile links found
-        print(f"DEBUG: Found {len(profile_links)} profile links")
-
-        possible_profiles = []
-        for link in profile_links:
-            # Debug: print each profile link and username found
-            print("DEBUG: Profile link:", link['href'], "Username:", link.text.strip())
-            found_username = link.text.strip()
-            profile_href = link['href']
-            profile_url = "https://bitcointalk.org/" + profile_href.lstrip("/")
-            possible_profiles.append((found_username, profile_url))
-
-        # Try exact match (case insensitive)
-        for uname, url in possible_profiles:
-            if uname.lower() == user_input.lower():
-                return scrape_profile(url)
-
-        # If no exact match, fallback: return first profile if exists
-        if possible_profiles:
-            return scrape_profile(possible_profiles[0][1])
-
-        # No profiles found at all
         return jsonify({"error": f"No profile found for username '{user_input}'"}), 404
 
     except Exception as e:
