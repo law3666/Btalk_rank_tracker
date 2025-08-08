@@ -49,6 +49,9 @@ def scrape():
         if not user_input:
             return jsonify({"error": "No URL or username provided"}), 400
 
+        # Debug: Print user input
+        print("DEBUG: Searching for username:", user_input)
+
         # CASE 1 — Already a profile link with u=ID
         if re.search(r"u=\d+", user_input):
             profile_url = user_input
@@ -60,15 +63,24 @@ def scrape():
         search_url = f"https://bitcointalk.org/index.php?action=mlist;sa=search;search={user_input}"
         search_resp = requests.get(search_url, headers=headers, timeout=10)
 
+        # Debug: print search response status and snippet
+        print("DEBUG: Search page status:", search_resp.status_code)
+        print("DEBUG: Search page content snippet:", search_resp.text[:500])
+
         if search_resp.status_code != 200:
             return jsonify({"error": "Failed to fetch member search results"}), 500
 
         search_soup = BeautifulSoup(search_resp.text, "html.parser")
 
-        # Find all profile links and their usernames from the search results
+        profile_links = search_soup.find_all("a", href=re.compile(r"action=profile;u=\d+"))
+
+        # Debug: print number of profile links found
+        print(f"DEBUG: Found {len(profile_links)} profile links")
+
         possible_profiles = []
-        for link in search_soup.find_all("a", href=re.compile(r"action=profile;u=\d+")):
-            # The username text is usually inside the <a> tag
+        for link in profile_links:
+            # Debug: print each profile link and username found
+            print("DEBUG: Profile link:", link['href'], "Username:", link.text.strip())
             found_username = link.text.strip()
             profile_href = link['href']
             profile_url = "https://bitcointalk.org/" + profile_href.lstrip("/")
