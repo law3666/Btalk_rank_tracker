@@ -10,8 +10,7 @@ CORS(app)
 @app.route('/')
 def home():
     return render_template('index.html')
-
-# Rank thresholds
+# Define Bitcointalk rank thresholds
 RANKS = [
     {"name": "Brand New", "activity": 0, "merit": 0},
     {"name": "Newbie", "activity": 1, "merit": 0},
@@ -31,67 +30,30 @@ def calculate_rank(activity, merit):
                 return "Brand New", RANKS[i + 1]["name"], 0, 0, 0, RANKS[i + 1]["activity"], RANKS[i + 1]["merit"]
             current = RANKS[i - 1]
             next_rank = RANKS[i]
+            
             activity_progress = min(100, round((activity / next_rank["activity"]) * 100))
             merit_progress = min(100, round((merit / next_rank["merit"]) * 100))
             progress = round((activity_progress + merit_progress) / 2)
+
             needed_activity = max(0, next_rank["activity"] - activity)
             needed_merit = max(0, next_rank["merit"] - merit)
+
             return current["name"], next_rank["name"], progress, activity_progress, merit_progress, needed_activity, needed_merit
+
     return "Legendary", "Max Rank", 100, 100, 100, 0, 0
 
 @app.route('/scrape', methods=['POST'])
 def scrape():
     try:
         data = request.get_json()
-        user_input = (data.get("url") or "").strip()
+        profile_url = (data.get("url") or "").strip()
+
+        if not profile_url:
+            return jsonify({"error": "No URL provided"}), 400
+
+        print(f"🔗 Scraping URL: {profile_url}")
         headers = {'User-Agent': 'Mozilla/5.0'}
-
-        if not user_input:
-            return jsonify({"error": "No URL or username provided"}), 400
-
-        print("DEBUG: Searching for username:", user_input)
-
-        # CASE 1 — If already a profile link with u=ID
-        if re.search(r"u=\d+", user_input):
-            profile_url = user_input
-            if not profile_url.startswith("http"):
-                profile_url = "https://" + profile_url
-            return scrape_profile(profile_url)
-
-        # CASE 2 — Attempt BPIP API fallback
-        from urllib.parse import quote
-        encoded_name = quote(user_input)
-        bpip_api_url = f"https://bpip.org/json.ashx?u={encoded_name}"
-        bpip_resp = requests.get(bpip_api_url, headers=headers, timeout=10)
-
-        print("DEBUG: BPIP API status:", bpip_resp.status_code)
-        print("DEBUG: BPIP API response snippet:", bpip_resp.text[:300])
-
-        # Try parsing JSON only if response looks like JSON (starts with '[' or '{')
-        if bpip_resp.status_code == 200 and bpip_resp.text.strip().startswith('['):
-            try:
-                bpip_data = bpip_resp.json()
-                if isinstance(bpip_data, list) and bpip_data:
-                    user_id = bpip_data[0].get("UserID")
-                    if user_id:
-                        profile_url = f"https://bitcointalk.org/index.php?action=profile;u={user_id}"
-                        return scrape_profile(profile_url)
-            except Exception as e:
-                print("⚠ BPIP JSON parse error:", e)
-        else:
-            print("⚠ BPIP API response is not JSON; skipping BPIP fallback")
-
-        return jsonify({"error": f"No profile found for username '{user_input}'"}), 404
-
-    except Exception as e:
-        print(f"❌ Error: {e}")
-        return jsonify({"error": str(e)}), 500
-
-def scrape_profile(profile_url):
-    """Scrape Bitcointalk profile data."""
-    try:
-        headers = {'User-Agent': 'Mozilla/5.0'}
-        response = requests.get(profile_url, headers=headers, timeout=10)
+        response = requests.get(profile_url, headers=headers)
 
         if response.status_code != 200:
             return jsonify({"error": "Failed to fetch profile page"}), 500
@@ -102,6 +64,7 @@ def scrape_profile(profile_url):
 
         page_text = soup.get_text(" ", strip=True)
 
+        # Use regex to extract profile info
         posts = activity = merit = "N/A"
 
         match = re.search(r"Posts:\s*([\d,]+)", page_text)
@@ -129,10 +92,10 @@ def scrape_profile(profile_url):
 
         current_rank, next_rank, progress, act_prog, merit_prog, needed_activity, needed_merit = calculate_rank(activity_int, merit_int)
 
+        print(f"✅ Scrape successful for {username}")
         return jsonify({
             "status": "✅ Scrape successful",
             "username": username,
-            "profile_url": profile_url,
             "posts": posts,
             "activity": activity,
             "merit": merit,
@@ -143,7 +106,8 @@ def scrape_profile(profile_url):
             "merit_progress": merit_prog,
             "needed_activity": needed_activity,
             "needed_merit": needed_merit
-        })
+})
+
     except Exception as e:
         print(f"❌ Error: {e}")
         return jsonify({"error": str(e)}), 500
