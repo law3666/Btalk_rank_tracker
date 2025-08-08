@@ -39,26 +39,6 @@ def calculate_rank(activity, merit):
             return current["name"], next_rank["name"], progress, activity_progress, merit_progress, needed_activity, needed_merit
     return "Legendary", "Max Rank", 100, 100, 100, 0, 0
 
-def resolve_username_to_id(username):
-    """Use BPIP to get the numeric user ID from a username."""
-    try:
-        headers = {"User-Agent": "Mozilla/5.0"}
-        bpip_url = f"https://bpip.org/{username}"
-        r = requests.get(bpip_url, headers=headers, timeout=10)
-        if r.status_code != 200:
-            return None
-        soup = BeautifulSoup(r.text, "html.parser")
-        # Look for profile link containing u=XXXX
-        link = soup.find("a", href=re.compile(r"u=\d+"))
-        if link:
-            match = re.search(r"u=(\d+)", link["href"])
-            if match:
-                return match.group(1)
-    except Exception as e:
-        print(f"BPIP lookup error: {e}")
-    return None
-
-
 @app.route('/scrape', methods=['POST'])
 def scrape():
     try:
@@ -69,39 +49,35 @@ def scrape():
         if not user_input:
             return jsonify({"error": "No URL or username provided"}), 400
 
-        # CASE 1 — Already profile link
+        # CASE 1 — Already profile link with u=ID
         if re.search(r"u=\d+", user_input):
             profile_url = user_input
             if not profile_url.startswith("http"):
                 profile_url = "https://" + profile_url
             return scrape_profile(profile_url)
 
-        # CASE 2 — Try memberlist search
-        search_url = f"https://bitcointalk.org/index.php?action=mlist;sa=search;search={user_input}"
-        search_resp = requests.get(search_url, headers=headers, timeout=10)
+        # CASE 2 — Assume it's a username, try BPIP JSON API
+        bpip_api_url = f"https://bpip.org/json.ashx?u={user_input}"
+        bpip_resp = requests.get(bpip_api_url, headers=headers, timeout=10)
 
-        profile_url = None
-        if search_resp.status_code == 200:
-            search_soup = BeautifulSoup(search_resp.text, "html.parser")
-            profile_link = search_soup.find("a", href=re.compile(r"action=profile;u=\d+"))
-            if profile_link:
-                profile_url = "https://bitcointalk.org/" + profile_link["href"].lstrip("/")
+        if bpip_resp.status_code == 200:
+            try:
+                bpip_data = bpip_resp.json()
+            except ValueError:
+                return jsonify({"error": "BPIP returned invalid JSON"}), 500
 
-        # CASE 3 — If still not found, try BPIP fallback
-        if not profile_url:
-            user_id = resolve_username_to_id(user_input)
-            if user_id:
-                profile_url = f"https://bitcointalk.org/index.php?action=profile;u={user_id}"
+            if isinstance(bpip_data, list) and bpip_data:
+                user_id = bpip_data[0].get("UserID")
+                if user_id:
+                    profile_url = f"https://bitcointalk.org/index.php?action=profile;u={user_id}"
+                    return scrape_profile(profile_url)
 
-        if not profile_url:
-            return jsonify({"error": f"No profile found for username '{user_input}'"}), 404
-
-        return scrape_profile(profile_url)
+        # No match found
+        return jsonify({"error": f"No profile found for username '{user_input}'"}), 404
 
     except Exception as e:
         print(f"❌ Error: {e}")
         return jsonify({"error": str(e)}), 500
-
 
 def scrape_profile(profile_url):
     """Scrape Bitcointalk profile data."""
@@ -163,7 +139,6 @@ def scrape_profile(profile_url):
     except Exception as e:
         print(f"❌ Error: {e}")
         return jsonify({"error": str(e)}), 500
-
 
 if __name__ == '__main__':
     app.run()
